@@ -23,12 +23,26 @@ namespace StaticAnalysisDS
         {
             if (BooleanVariables.ContainsKey(varName))
                 BooleanVariables[varName].Add(v);
+            
+            Console.WriteLine(varName + ' ' + v);
         }
 
         internal void SetInteger(string varName, int v)
         {
             if (IntegerVariables.ContainsKey(varName))
                 IntegerVariables[varName].Add(v);
+
+            Console.WriteLine(varName + ' ' + v);
+        }
+
+        internal void DefineIntegerVar(string varName)
+        {
+            IntegerVariables.Add(varName, new HashSet<int>());
+        }
+
+        internal void DefineBooleanVar(string varName)
+        {
+            BooleanVariables.Add(varName, new HashSet<bool>());
         }
     }
 }

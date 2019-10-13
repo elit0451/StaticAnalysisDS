@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace StaticAnalysisDS
 {
@@ -12,6 +13,7 @@ namespace StaticAnalysisDS
         private int skipElse;
         private bool skipCurrentBlock;
         private int currentBlockBracketCount;
+        private Regex regex;
 
         public StateMachine(string filePath)
         {
@@ -75,53 +77,80 @@ namespace StaticAnalysisDS
 
         private void DefineVar(string command)
         {
-            string[] syntax = command.Split(' ');
-            string varName = syntax[0].Substring(0, syntax[0].IndexOf(':'));
-            string varType = syntax[1];
+            regex = new Regex(@"(\w+):\s+(\w+)");
+            Match match = regex.Match(command);
+            if (match.Success)
+            {
+                string varName = match.Groups[1].Value;
+                string varType = match.Groups[2].Value;
+
+                if (varType == "INTEGER")
+                    currentState.DefineIntegerVar(varName);
+                else
+                    currentState.DefineBooleanVar(varName);
+            }
         }
         private void SetVar(string command)
         {
-            string[] syntax = command.Split(' ');
-            string varName = syntax[0];
             string value = "";
 
-            if (syntax.Length > 3)
+            regex = new Regex(@"(\w+)\s+=\s(.*)");
+            Match match = regex.Match(command);
+
+            if (match.Success)
             {
-                string operand1 = syntax[2];
-                string operation = syntax[3];
-                string operand2 = syntax[4];
+                string varName = match.Groups[1].Value;
+                string expression = match.Groups[2].Value;
+
+                if (expression.Contains(' '))
+                {
+                    regex = new Regex(@"(\w+)\s+(.)\s(\w+)");
+                    Match matchOperands = regex.Match(expression);
+                    if (matchOperands.Success)
+                    {
+                        string operand1 = matchOperands.Groups[1].Value;
+                        string operation = matchOperands.Groups[2].Value;
+                        string operand2 = matchOperands.Groups[3].Value;
+
+                        if (currentState.IsVarBoolean(varName))
+                            value = CalculateBoolOperation(operand1, operand2, operation).ToString();
+                        else
+                            value = CalculateIntOperation(operand1, operand2, operation).ToString();
+                    }
+                }
+                else
+                {
+                    value = expression;
+                }
 
                 if (currentState.IsVarBoolean(varName))
-                    value = CalculateBoolOperation(operand1, operand2, operation).ToString();
+                    currentState.SetBoolean(varName, bool.Parse(value));
                 else
-                    value = CalculateIntOperation(operand1, operand2, operation).ToString();
+                    currentState.SetInteger(varName, int.Parse(value));
             }
-            else
-            {
-                value = syntax[2];
-            }
-
-            if (currentState.IsVarBoolean(varName))
-                currentState.SetBoolean(varName, bool.Parse(value));
-            else
-                currentState.SetInteger(varName, int.Parse(value));
         }
 
         private void EvaluateIf(string predicate)
         {
-            string[] syntax = predicate.Split(' ');
-            string operand1 = syntax[0];
-            string operation = syntax[1];
-            string operand2 = syntax[2];
+            regex = new Regex(@"(\w+)\s+(.+)\s(\w+)");
+            Match match = regex.Match(predicate);
 
-            bool result = CalculateBoolOperation(operand1, operand2, operation);
+            if (match.Success)
+            {
+                string operand1 = match.Groups[1].Value;
+                string operation = match.Groups[2].Value;
+                string operand2 = match.Groups[3].Value;
 
-            if (result == true)
-                skipElse++;
-            else
-            { 
-                skipCurrentBlock = true;
-                currentBlockBracketCount = 1;
+                bool result = CalculateBoolOperation(operand1, operand2, operation);
+
+                if (result == true)
+                    skipElse++;
+                else
+                {
+                    skipCurrentBlock = true;
+                    currentBlockBracketCount = 1;
+                }
+
             }
         }
 
