@@ -19,16 +19,17 @@ namespace StaticAnalysisDS
             return BooleanVariables.ContainsKey(varName);
         }
 
-        internal void SetBoolean(string varName, bool v)
+        internal void SetBoolean(string varName, bool value)
         {
             if (BooleanVariables.ContainsKey(varName))
-                BooleanVariables[varName].Add(v);
+                BooleanVariables[varName].Add(value);
         }
 
-        internal void SetInteger(string varName, int v)
+        internal void SetInteger(string varName, int value)
         {
             if (IntegerVariables.ContainsKey(varName))
-                IntegerVariables[varName].Add(v);
+                IntegerVariables[varName].Add(value);
+            Console.WriteLine(value);
         }
     }
 }

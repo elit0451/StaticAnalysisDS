@@ -8,121 +8,45 @@ namespace StaticAnalysisDS
     public class StateMachine
     {
         private State currentState;
-        private Queue<string> commands;
-        private int skipElse;
-        private bool skipCurrentBlock;
-        private int currentBlockBracketCount;
 
-        public StateMachine(string filePath)
+        public StateMachine()
         {
             currentState = new State();
-            commands = new Queue<string>();
-            skipElse = 0;
-            skipCurrentBlock = false;
-            currentBlockBracketCount = 0;
-
-            string line = "";
-
-            using (StreamReader reader = new StreamReader(filePath))
-            {
-                while ((line = reader.ReadLine()) != null)
-                {
-                    commands.Enqueue(line.ToUpper().Trim());
-                }
-            }
         }
-
-        public void NextStep()
+        public void DefineVar(string varName, string varType)
         {
-            string nextCommand = commands.Dequeue();
-
-            if (skipCurrentBlock)
-            {
-                if (nextCommand.Contains('{'))
-                    currentBlockBracketCount++;
-                else if (nextCommand.Contains('}'))
-                {
-                    currentBlockBracketCount--;
-                    if (currentBlockBracketCount == 0)
-                        skipCurrentBlock = false;
-                }
-                return;
-            }
-
-            switch (nextCommand.Split(' ')[0])
-            {
-                case "DEF":
-                    DefineVar(nextCommand.Substring(nextCommand.IndexOf("DEF") + 4));
-                    break;
-                case "LET":
-                    SetVar(nextCommand.Substring(nextCommand.IndexOf("LET") + 4));
-                    break;
-                case "IF":
-                    EvaluateIf(nextCommand.Substring(nextCommand.IndexOf("IF") + 4, nextCommand.IndexOf(')') - 4));
-                    break;
-                case "ELSE":
-                    if (skipElse > 0)
-                    {
-                        skipElse--;
-                        skipCurrentBlock = true;
-                        currentBlockBracketCount = 1;
-                    }
-                    break;
-                case "WHILE":
-                    break;
-            }
+            //if (varType == "INTEGER")
+            //call currentState.SetInteger(varName, );
+            //else
+            //call currentState.SetBoolean(varName, );
         }
-
-        private void DefineVar(string command)
+        public void SetVar(string varName, string operand1, string operand2 = "", string operation = "")
         {
-            string[] syntax = command.Split(' ');
-            string varName = syntax[0].Substring(0, syntax[0].IndexOf(':'));
-            string varType = syntax[1];
-        }
-        private void SetVar(string command)
-        {
-            string[] syntax = command.Split(' ');
-            string varName = syntax[0];
-            string value = "";
+            string resultValue = "";
 
-            if (syntax.Length > 3)
+            if (operand2 != "" && operation != "")
             {
-                string operand1 = syntax[2];
-                string operation = syntax[3];
-                string operand2 = syntax[4];
-
                 if (currentState.IsVarBoolean(varName))
-                    value = CalculateBoolOperation(operand1, operand2, operation).ToString();
+                    resultValue = CalculateBoolOperation(operand1, operand2, operation).ToString();
                 else
-                    value = CalculateIntOperation(operand1, operand2, operation).ToString();
+                    resultValue = CalculateIntOperation(operand1, operand2, operation).ToString();
             }
             else
             {
-                value = syntax[2];
+                resultValue = operand1;
             }
 
             if (currentState.IsVarBoolean(varName))
-                currentState.SetBoolean(varName, bool.Parse(value));
+                currentState.SetBoolean(varName, bool.Parse(resultValue));
             else
-                currentState.SetInteger(varName, int.Parse(value));
+                currentState.SetInteger(varName, int.Parse(resultValue));
         }
 
-        private void EvaluateIf(string predicate)
+        public bool EvaluateIf(string operand1, string operand2, string operation)
         {
-            string[] syntax = predicate.Split(' ');
-            string operand1 = syntax[0];
-            string operation = syntax[1];
-            string operand2 = syntax[2];
-
             bool result = CalculateBoolOperation(operand1, operand2, operation);
 
-            if (result == true)
-                skipElse++;
-            else
-            { 
-                skipCurrentBlock = true;
-                currentBlockBracketCount = 1;
-            }
+            return result;
         }
 
         private int CalculateIntOperation(string operand1, string operand2, string operation)

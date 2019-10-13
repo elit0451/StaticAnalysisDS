@@ -12,9 +12,16 @@ namespace StaticAnalysisDS
 
         private void Run()
         {
-            string path = @".\VSSL.txt";
-            StateMachine stateMachine = new StateMachine(path);
-            stateMachine.NextStep();
+            string path = @"C:\Users\elitsa\source\repos\StaticAnalysisDS\StaticAnalysisDS\bin\Debug\VSSL.txt";
+            VSSLInterpreter interpreter = new VSSLInterpreter(path);
+            interpreter.NextStep();
+            interpreter.NextStep();
+            interpreter.NextStep();
+            interpreter.NextStep();
+            interpreter.NextStep();
+            interpreter.NextStep();
+            interpreter.NextStep();
+            interpreter.NextStep();
         }
     }
 }
