@@ -13,33 +13,36 @@ namespace StaticAnalysisDS
         private IBlock _currentBlock;
         private bool _isFinished;
         private Queue<string> _commands;
-        private int _totalLines;
-        private int _usedLines;
+        private bool? _predicateMet;
 
         public WhileBlock(Queue<string> commands, State state)
         {
-            _totalLines = commands.Count;
             _predicate = commands.Dequeue();
             _commands = new Queue<string>(commands);
-            _usedLines = 1;
 
             _blocks = BlockGenerator.Generate(commands, state).ToArray();
             _state = state;
             _blockIndex = 0;
             _currentBlock = null;
             _isFinished = false;
+            _predicateMet = null;
         }
 
         public void NextStep()
         {
-            if (_isFinished)
+            if (_predicateMet is null)
+            {
+                _predicateMet = EvaluatePrecondition(_predicate);
+                Console.WriteLine(_predicate + "\t" + _predicateMet);
+            }
+
+            if (_isFinished || _predicateMet == false)
                 return;
 
             if (_currentBlock is null)
                 _currentBlock = _blocks[_blockIndex];
-            
+
             _currentBlock.NextStep();
-            _usedLines = _currentBlock.CurrentLine();
 
             if (_currentBlock.IsFinished())
             {
@@ -62,7 +65,7 @@ namespace StaticAnalysisDS
 
         public bool IsFinished()
         {
-            return _isFinished;
+            return _isFinished || _predicateMet == false;
         }
         private bool EvaluatePrecondition(string predicate)
         {
@@ -123,18 +126,6 @@ namespace StaticAnalysisDS
         private bool IsVariable(string varName)
         {
             return _state.VarExists(varName);
-        }
-
-        public int CurrentLine()
-        {
-            int result = _usedLines;
-
-            return result;
-        }
-
-        public int TotalLines()
-        {
-            return _totalLines;
         }
     }
 }

@@ -94,13 +94,15 @@ namespace StaticAnalysisDS
 
                 if (line.StartsWith("IF") || line.StartsWith("WHILE"))
                     blockFinished = true;
+                else if (line.Contains('}') || line == string.Empty)
+                    commands.Dequeue();
                 else
                     instructions.Enqueue(commands.Dequeue());
             }
 
             IBlock genBlock = null;
-                
-            if(instructions.Count > 0)
+
+            if (instructions.Count > 0)
                 genBlock = new GeneralBlock(instructions, state);
 
             return genBlock;

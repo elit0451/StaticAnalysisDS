@@ -12,30 +12,26 @@ namespace StaticAnalysisDS
         private IBlock _currentBlock;
         private State _state;
         private string _predicate;
-        private int _totalLinesIf;
-        private int _totalLinesElse;
-        private int _usedLines;
 
         public IfBlock(Queue<string> commandsIf, Queue<string> commandsElse, State state)
         {
-            _totalLinesIf = commandsIf.Count;
-            _totalLinesElse = commandsElse.Count;
             _state = state;
             _predicate = commandsIf.Dequeue();
             // dequeue first line 
             if (commandsElse.Count > 0)
                 commandsElse.Dequeue();
 
-            _usedLines = 1;
-
             _blocksIf = BlockGenerator.Generate(commandsIf, state);
             _blocksElse = BlockGenerator.Generate(commandsElse, state);
-
         }
+
         public void NextStep()
         {
             if (_inIf is null)
+            {
                 _inIf = EvaluateIf(_predicate);
+                Console.WriteLine(_predicate + "\t" + _inIf);
+            }
 
             if (_inIf == true)
             {
@@ -51,10 +47,7 @@ namespace StaticAnalysisDS
             _currentBlock.NextStep();
 
             if (_currentBlock.IsFinished())
-            {
-                _usedLines = _currentBlock.CurrentLine();
                 _currentBlock = null;
-            }
         }
         public bool IsFinished()
         {
@@ -123,27 +116,6 @@ namespace StaticAnalysisDS
         private bool IsVariable(string varName)
         {
             return _state.VarExists(varName);
-        }
-
-        public int CurrentLine()
-        {
-            int result = _usedLines;
-
-            if (_inIf == false)
-                result += _totalLinesIf;
-
-            if (!(_currentBlock is null))
-                result += _currentBlock.CurrentLine() + _usedLines;
-
-            return result;
-        }
-
-        public int TotalLines()
-        {
-            if (_inIf == true)
-                return _totalLinesIf;
-            else
-                return _totalLinesElse;
         }
     }
 }

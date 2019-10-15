@@ -12,33 +12,26 @@ namespace StaticAnalysisDS
 
         private void Run()
         {
+            bool exit = true;
             string path = @"C:\Users\elitsa\source\repos\StaticAnalysisDS\StaticAnalysisDS\bin\Debug\VSSL.txt";
             StateMachine stateMachine = new StateMachine(path);
-            stateMachine.NextStep();
-            Console.WriteLine(stateMachine.CurrentLine());
-            stateMachine.NextStep();
-            Console.WriteLine(stateMachine.CurrentLine());
-            stateMachine.NextStep();
-            Console.WriteLine(stateMachine.CurrentLine());
-            stateMachine.NextStep();
-            Console.WriteLine(stateMachine.CurrentLine());
-            stateMachine.NextStep();
-            Console.WriteLine(stateMachine.CurrentLine());
-            stateMachine.NextStep();
-            Console.WriteLine(stateMachine.CurrentLine());
-            stateMachine.NextStep();
-            Console.WriteLine(stateMachine.CurrentLine());
-            stateMachine.NextStep();
-            Console.WriteLine(stateMachine.CurrentLine());
-            stateMachine.NextStep();
-            Console.WriteLine(stateMachine.CurrentLine());
-            stateMachine.NextStep();
-            Console.WriteLine(stateMachine.CurrentLine());
-            stateMachine.NextStep();
-            Console.WriteLine(stateMachine.CurrentLine());
-            stateMachine.NextStep();
-            //stateMachine.PrintCurrentState();
-            Console.WriteLine(stateMachine.CurrentLine());
+            while (exit)
+            {
+                try
+                {
+                    Console.Clear();
+                    stateMachine.NextStep();
+                    stateMachine.PrintCurrentState();
+                    Console.ReadKey();
+                }
+                catch (Exception e)
+                {
+                    exit = false;
+                    Console.WriteLine("No more commands");
+                }
+            }
+
+
             ////stateMachine.PrintCurrentState();
             //stateMachine.NextStep();
             ////stateMachine.PrintCurrentState();

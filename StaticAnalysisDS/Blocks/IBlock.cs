@@ -4,7 +4,5 @@
     {
         bool IsFinished();
         void NextStep();
-        int CurrentLine();
-        int TotalLines();
     }
 }

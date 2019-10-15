@@ -32,26 +32,19 @@ namespace StaticAnalysisDS
             _currentBlock = null;
         }
 
-        internal int CurrentLine()
-        {
-            if (!(_currentBlock is null))
-                return _currentBlock.CurrentLine() + _totalLines;
-
-            return _totalLines;
-        }
-
         public void NextStep()
         {
+            if (_blocks.Count <= 0 && _currentBlock is null)
+                throw new Exception("Program finished");
+
             if (_currentBlock is null)
                 _currentBlock = _blocks.Dequeue();
             _currentBlock.NextStep();
 
             if (_currentBlock.IsFinished())
-            {
-                _totalLines += _currentBlock.CurrentLine();
                 _currentBlock = null;
-            }
         }
+
         public void PrintCurrentState()
         {
             Dictionary<string, int?> integers = _state.GetIntegers();

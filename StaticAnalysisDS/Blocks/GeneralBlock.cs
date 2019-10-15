@@ -9,13 +9,9 @@ namespace StaticAnalysisDS
         private Queue<string> _commands;
         private State _state;
         private Regex _regex;
-        private int _totalLines;
-        private int _usedLines;
 
         public GeneralBlock(Queue<string> commands, State state)
         {
-            _totalLines = commands.Count;
-            _usedLines = 0;
             _commands = commands;
             _state = state;
         }
@@ -26,10 +22,7 @@ namespace StaticAnalysisDS
                 return;
 
             string nextCommand = _commands.Dequeue();
-            _usedLines++;
-
-            if (nextCommand.Contains('}') || nextCommand == string.Empty)
-                return;
+            Console.WriteLine(nextCommand);
 
             switch (nextCommand.Split(' ')[0])
             {
@@ -154,16 +147,6 @@ namespace StaticAnalysisDS
         private bool IsVariable(string varName)
         {
             return _state.VarExists(varName);
-        }
-
-        public int CurrentLine()
-        {
-            return _usedLines;
-        }
-
-        public int TotalLines()
-        {
-            return _totalLines;
         }
     }
 }
