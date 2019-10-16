@@ -1,4 +1,5 @@
-﻿using System;
+﻿using StaticAnalysisDS.Intreperters;
+using System;
 
 namespace StaticAnalysisDS
 {
@@ -13,8 +14,10 @@ namespace StaticAnalysisDS
         private void Run()
         {
             bool exit = true;
-            string path = @"C:\Users\elitsa\source\repos\StaticAnalysisDS\StaticAnalysisDS\bin\Debug\VSSL.txt";
+            string path = @"F:\School\DiscreteMath\StaticAnalysisDS\VSSL.txt";
+
             StateMachine stateMachine = new StateMachine(path);
+
             while (exit)
             {
                 try

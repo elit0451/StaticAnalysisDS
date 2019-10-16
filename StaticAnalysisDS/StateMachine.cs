@@ -1,4 +1,5 @@
-﻿using System;
+﻿using StaticAnalysisDS.Intreperters;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -20,6 +21,8 @@ namespace StaticAnalysisDS
             _state = new State();
             _totalLines = 0;
 
+            IIntreperter intreperter = new VSSLIntreperter(_state);
+
             using (StreamReader reader = new StreamReader(filePath))
             {
                 while ((line = reader.ReadLine()) != null)
@@ -28,7 +31,7 @@ namespace StaticAnalysisDS
                 }
             }
 
-            _blocks = BlockGenerator.Generate(commands, _state);
+            _blocks = BlockGenerator.Generate(commands, _state, intreperter);
             _currentBlock = null;
         }
 
