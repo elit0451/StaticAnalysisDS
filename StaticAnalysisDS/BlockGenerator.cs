@@ -1,11 +1,12 @@
-﻿using System;
+﻿using StaticAnalysisDS.Intreperters;
+using System;
 using System.Collections.Generic;
 
 namespace StaticAnalysisDS
 {
     internal static class BlockGenerator
     {
-        internal static Queue<IBlock> Generate(Queue<string> commands, State state)
+        internal static Queue<IBlock> Generate(Queue<string> commands, State state, IIntreperter intreperter)
         {
             Queue<IBlock> blocks = new Queue<IBlock>();
 
@@ -14,16 +15,16 @@ namespace StaticAnalysisDS
                 string line = commands.Peek();
 
                 if (line.StartsWith("IF"))
-                    blocks.Enqueue(GetIfBlock(commands, state));
+                    blocks.Enqueue(GetIfBlock(commands, state, intreperter));
                 else if (line.StartsWith("WHILE"))
-                    blocks.Enqueue(GetWhileBlock(commands, state));
+                    blocks.Enqueue(GetWhileBlock(commands, state, intreperter));
                 else
-                    blocks.Enqueue(GetGeneralBlock(commands, state));
+                    blocks.Enqueue(GetGeneralBlock(commands, intreperter));
             }
 
             return blocks;
         }
-        private static IBlock GetIfBlock(Queue<string> commands, State state)
+        private static IBlock GetIfBlock(Queue<string> commands, State state, IIntreperter intreperter)
         {
             Queue<string> instructionsIf = new Queue<string>();
             Queue<string> instructionsElse = new Queue<string>();
@@ -54,11 +55,11 @@ namespace StaticAnalysisDS
                 }
             }
 
-            IBlock ifBlock = new IfBlock(instructionsIf, instructionsElse, state);
+            IBlock ifBlock = new IfBlock(instructionsIf, instructionsElse, state, intreperter);
 
             return ifBlock;
         }
-        private static IBlock GetWhileBlock(Queue<string> commands, State state)
+        private static IBlock GetWhileBlock(Queue<string> commands, State state, IIntreperter intreperter)
         {
             Queue<string> instructions = new Queue<string>();
             bool blockFinished = false;
@@ -79,11 +80,11 @@ namespace StaticAnalysisDS
                     blockFinished = true;
             }
 
-            IBlock whileBlock = new WhileBlock(instructions, state);
+            IBlock whileBlock = new WhileBlock(instructions, state, intreperter);
 
             return whileBlock;
         }
-        private static IBlock GetGeneralBlock(Queue<string> commands, State state)
+        private static IBlock GetGeneralBlock(Queue<string> commands, IIntreperter intreperter)
         {
             Queue<string> instructions = new Queue<string>();
             bool blockFinished = false;
@@ -103,7 +104,7 @@ namespace StaticAnalysisDS
             IBlock genBlock = null;
 
             if (instructions.Count > 0)
-                genBlock = new GeneralBlock(instructions, state);
+                genBlock = new GeneralBlock(instructions, intreperter);
 
             return genBlock;
         }
